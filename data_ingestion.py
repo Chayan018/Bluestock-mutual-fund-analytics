@@ -1,16 +1,22 @@
-# data_ingestion.py
-
 import pandas as pd
 import os
 
-path = "data/raw"
+DATA_FOLDER = "data/raw"
 
-for file in os.listdir(path):
-    if file.endswith(".csv"):
-        df = pd.read_csv(os.path.join(path, file))
+files = [f for f in os.listdir(DATA_FOLDER) if f.endswith(".csv")]
 
-        print("\n", "="*50)
-        print("File:", file)
+print("=" * 80)
+print("DATASET EXPLORATION")
+print("=" * 80)
+
+for file in files:
+    path = os.path.join(DATA_FOLDER, file)
+
+    try:
+        df = pd.read_csv(path)
+
+        print(f"\nFILE: {file}")
+        print("-" * 50)
 
         print("Shape:")
         print(df.shape)
@@ -18,5 +24,11 @@ for file in os.listdir(path):
         print("\nData Types:")
         print(df.dtypes)
 
-        print("\nFirst 5 Rows:")
+        print("\nHead:")
         print(df.head())
+
+        print("\nMissing Values:")
+        print(df.isnull().sum())
+
+    except Exception as e:
+        print(f"Error reading {file}: {e}")
