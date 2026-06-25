@@ -12,7 +12,6 @@ schemes = {
     "Axis_Bluechip": 119092,
     "Kotak_Bluechip": 120841
 }
-
 for name, code in schemes.items():
 
     url = f"https://api.mfapi.in/mf/{code}"
