@@ -1,76 +1,102 @@
--- 1. Top 5 Funds by AUM
+---------------------------------------------------
+-- 1 Top 5 Funds by Expense Ratio
+---------------------------------------------------
 
-SELECT d.scheme_name,
-       p.aum_crore
-FROM fact_performance p
-JOIN dim_fund d
-ON p.amfi_code = d.amfi_code
-ORDER BY p.aum_crore DESC
+SELECT scheme_name,
+expense_ratio_pct
+FROM dim_fund
+ORDER BY expense_ratio_pct DESC
 LIMIT 5;
 
--- 2. Average NAV
+---------------------------------------------------
+-- 2 Average NAV
+---------------------------------------------------
 
-SELECT AVG(nav) AS average_nav
+SELECT
+AVG(nav) AS Average_NAV
 FROM fact_nav;
 
--- 3. Average NAV by Fund
+---------------------------------------------------
+-- 3 Monthly Average NAV
+---------------------------------------------------
 
-SELECT amfi_code,
-       AVG(nav) AS avg_nav
+SELECT
+strftime('%Y-%m',date) AS Month,
+AVG(nav)
 FROM fact_nav
-GROUP BY amfi_code;
+GROUP BY Month
+ORDER BY Month;
 
--- 4. Transactions by State
+---------------------------------------------------
+-- 4 Transactions By State
+---------------------------------------------------
 
-SELECT state,
-       COUNT(*) AS total_transactions
+SELECT
+state,
+COUNT(*) AS Transactions
 FROM fact_transactions
 GROUP BY state
-ORDER BY total_transactions DESC;
+ORDER BY Transactions DESC;
 
--- 5. Total Investment by State
+---------------------------------------------------
+-- 5 Funds Expense Ratio Less Than 1%
+---------------------------------------------------
 
-SELECT state,
-       SUM(amount_inr) AS total_amount
-FROM fact_transactions
-GROUP BY state
-ORDER BY total_amount DESC;
+SELECT
+scheme_name,
+expense_ratio_pct
+FROM dim_fund
+WHERE expense_ratio_pct<1;
 
--- 6. Expense Ratio Below 1%
+---------------------------------------------------
+-- 6 Highest Sharpe Ratio
+---------------------------------------------------
 
-SELECT d.scheme_name,
-       p.expense_ratio_pct
-FROM fact_performance p
-JOIN dim_fund d
-ON p.amfi_code = d.amfi_code
-WHERE p.expense_ratio_pct < 1;
+SELECT
+amfi_code,
+sharpe_ratio
+FROM fact_performance
+ORDER BY sharpe_ratio DESC
+LIMIT 10;
 
--- 7. Top 5 Sharpe Ratio Funds
+---------------------------------------------------
+-- 7 Highest AUM
+---------------------------------------------------
 
-SELECT d.scheme_name,
-       p.sharpe_ratio
-FROM fact_performance p
-JOIN dim_fund d
-ON p.amfi_code = d.amfi_code
-ORDER BY p.sharpe_ratio DESC
-LIMIT 5;
+SELECT
+fund_house,
+aum_lakh_crore
+FROM fact_aum
+ORDER BY aum_lakh_crore DESC;
 
--- 8. Average Return (3 Year)
+---------------------------------------------------
+-- 8 Average Transaction Amount
+---------------------------------------------------
 
-SELECT AVG(return_3yr_pct)
-AS avg_3yr_return
-FROM fact_performance;
+SELECT
+AVG(amount_inr)
+FROM fact_transactions;
 
--- 9. KYC Status Distribution
+---------------------------------------------------
+-- 9 Portfolio Weight Above 5%
+---------------------------------------------------
 
-SELECT kyc_status,
-       COUNT(*) AS investors
-FROM fact_transactions
-GROUP BY kyc_status;
+SELECT
+company_name,
+weight_pct
+FROM fact_portfolio
+WHERE weight_pct>5;
 
--- 10. Transaction Type Distribution
+---------------------------------------------------
+-- 10 Benchmark Average
+---------------------------------------------------
 
-SELECT transaction_type,
-       COUNT(*) AS total
-FROM fact_transactions
-GROUP BY transaction_type;
+SELECT
+
+AVG(nifty50),
+
+AVG(nifty100),
+
+AVG(bse_smallcap)
+
+FROM dim_benchmark;
